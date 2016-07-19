@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<uexplugins>
+    <plugin
+        className="org.zywx.wbpalmstar.plugin.uexmqtt.EUExMqtt" uexName="uexMQTT">
+        <method name="init" params="" type="1"/>
+        <method name="connect" params="" type="1"/>
+        <method name="subscribe" params="" type="1"/>
+        <method name="unSubscribe" params="" type="1"/>
+        <method name="publish" params="" type="1"/>
+        <method name="disconnect" params="" type="1"/>
+        <method name="onStatusChange" params="" type="2"/>
+        <method name="onNewMessage" params="" type="2"/>
+    </plugin>
+</uexplugins>
