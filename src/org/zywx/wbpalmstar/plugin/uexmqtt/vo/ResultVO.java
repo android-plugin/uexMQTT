@@ -20,7 +20,5 @@ public class ResultVO implements Serializable {
 
     public String id;
 
-
-
-
+    public String data;
 }

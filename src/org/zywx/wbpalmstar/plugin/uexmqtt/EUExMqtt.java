@@ -255,6 +255,7 @@ public class EUExMqtt extends EUExBase{
         final ResultVO resultVO=new ResultVO();
         resultVO.id =publishVO.id;
         resultVO.topic=publishVO.topic;
+        resultVO.data=publishVO.data;
         mConnection.publish(publishVO.topic, publishVO.data.getBytes(), getQos(publishVO.qos),
                 publishVO.retainFlag, new Callback<Void>() {
                     @Override
