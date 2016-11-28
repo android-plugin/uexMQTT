@@ -22,7 +22,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.2.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files\
@@ -41,17 +41,23 @@ apply plugin: 'com.android.application'
 
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
-    compile(name: 'Engine-release-3.3', ext: 'aar')
+    compile 'org.appcan:engine:+:systemRelease@aar'
+//    compile 'org.fusesource.mqtt-client:mqtt-client:+'
 }
 
 repositories {
     flatDir {
         dirs 'libs'
     }
+
+    maven {
+        url 'https://raw.githubusercontent.com/android-plugin/mvn-repo/master/'
+    }
+
 }
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 23
     buildToolsVersion "23.0.2"
     lintOptions {
         abortOnError false
@@ -87,8 +93,13 @@ android {
     defaultConfig {
         minSdkVersion 14
         applicationId 'org.zywx.wbpalmstar.widgetone.uexMqtt'
+        multiDexEnabled true
     }
     productFlavors {
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
