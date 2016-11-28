@@ -57,17 +57,22 @@ public class EUExMqtt extends EUExBase{
         }
     }
 
-    public void init(String[] params) {
+    public boolean init(String[] params) {
         mqtt=new MQTT();
         mStatus=0;
         callbackStatus();
         callBackJsObjectOnUIThread(JsConst.CALLBACK_INIT, "");
+        return true;
     }
 
     public boolean connect(String[] params) {
         if (params == null || params.length < 1) {
             errorCallback(0, 0, "error params!");
             return false;
+        }
+        int callbackId=-1;
+        if (params.length>1){
+            callbackId= Integer.parseInt(params[1]);
         }
         if (mqtt==null){
             mqtt=new MQTT();
@@ -142,20 +147,29 @@ public class EUExMqtt extends EUExBase{
                 }
             });
             final ResultVO resultVO=new ResultVO();
+            final int finalCallbackId = callbackId;
             mConnection.connect(new Callback<Void>() {
                 @Override
                 public void onSuccess(Void value) {
                     BDebug.i("connect success...");
                     mStatus=2;
                     resultVO.isSuccess=true;
-                    callBackJsObjectOnUIThread(JsConst.CALLBACK_CONNECT,DataHelper.gson.toJsonTree(resultVO));
+                    if(finalCallbackId !=-1){
+                        callbackToJs(finalCallbackId,false,0);
+                    }else{
+                        callBackJsObjectOnUIThread(JsConst.CALLBACK_CONNECT,DataHelper.gson.toJsonTree(resultVO));
+                    }
                 }
 
                 @Override
                 public void onFailure(Throwable value) {
                     resultVO.isSuccess=false;
                     mStatus=4;
-                    callBackJsObjectOnUIThread(JsConst.CALLBACK_CONNECT,DataHelper.gson.toJsonTree(resultVO));
+                    if(finalCallbackId !=-1){
+                        callbackToJs(finalCallbackId,false,1,value.getMessage());
+                    }else{
+                        callBackJsObjectOnUIThread(JsConst.CALLBACK_CONNECT,DataHelper.gson.toJsonTree(resultVO));
+                    }
                 }
             });
         } catch (URISyntaxException e) {
@@ -181,26 +195,38 @@ public class EUExMqtt extends EUExBase{
         if (mConnection==null){
             return false;
         }
-
+        int callbackId=-1;
+        if (params.length>1){
+            callbackId= Integer.parseInt(params[1]);
+        }
         String json = params[0];
         SubscribeVO subscribeVO=DataHelper.gson.fromJson(json,SubscribeVO.class);
         Topic[] topics=new Topic[1];
         topics[0]=new Topic(subscribeVO.topic,getQos(subscribeVO.qos));
         final ResultVO resultVO=new ResultVO();
         resultVO.topic =subscribeVO.topic;
+        final int finalCallbackId = callbackId;
         mConnection.subscribe(topics, new Callback<byte[]>() {
             @Override
             public void onSuccess(byte[] value) {
                 BDebug.i("subscribe success:",new String(value));
                 resultVO.isSuccess=true;
-                callBackJsObjectOnUIThread(JsConst.CALLBACK_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                if(finalCallbackId !=-1){
+                    callbackToJs(finalCallbackId,false,0,DataHelper.gson.toJsonTree(resultVO));
+                }else{
+                    callBackJsObjectOnUIThread(JsConst.CALLBACK_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                }
             }
 
             @Override
             public void onFailure(Throwable value) {
                 BDebug.i("subscribe onFailure:",value.getMessage());
                 resultVO.isSuccess=false;
-                callBackJsObjectOnUIThread(JsConst.CALLBACK_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                 if(finalCallbackId !=-1){
+                    callbackToJs(finalCallbackId,false,1,value.getMessage());
+                }else{
+                     callBackJsObjectOnUIThread(JsConst.CALLBACK_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                 }
             }
         });
         return true;
@@ -224,23 +250,36 @@ public class EUExMqtt extends EUExBase{
             errorCallback(0, 0, "error params!");
             return;
         }
+        int callbackId=-1;
+        if (params.length>1){
+            callbackId= Integer.parseInt(params[1]);
+        }
         String json = params[0];
         SubscribeVO unsubscribeVO=DataHelper.gson.fromJson(json,SubscribeVO.class);
         UTF8Buffer[] utf8Buffers=new UTF8Buffer[1];
         utf8Buffers[0]=UTF8Buffer.utf8(unsubscribeVO.topic);
         final ResultVO resultVO=new ResultVO();
         resultVO.topic = unsubscribeVO.topic;
+        final int finalCallbackId = callbackId;
         mConnection.unsubscribe(utf8Buffers, new Callback<Void>() {
             @Override
             public void onSuccess(Void value) {
                 resultVO.isSuccess=true;
-                callBackJsObjectOnUIThread(JsConst.CALLBACK_UN_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                if(finalCallbackId !=-1){
+                     callbackToJs(finalCallbackId,false,0,DataHelper.gson.toJsonTree(resultVO));
+                }else{
+                     callBackJsObjectOnUIThread(JsConst.CALLBACK_UN_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                 }
             }
 
             @Override
             public void onFailure(Throwable value) {
                 resultVO.isSuccess=false;
-                callBackJsObjectOnUIThread(JsConst.CALLBACK_UN_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                if(finalCallbackId !=-1){
+                    callbackToJs(finalCallbackId,false,1,value.getMessage());
+                }else{
+                    callBackJsObjectOnUIThread(JsConst.CALLBACK_UN_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
+                }
             }
         });
     }
@@ -250,33 +289,51 @@ public class EUExMqtt extends EUExBase{
             errorCallback(0, 0, "error params!");
             return;
         }
+        int callbackId=-1;
+        if (params.length>1){
+            callbackId= Integer.parseInt(params[1]);
+        }
         String json = params[0];
         PublishVO publishVO=DataHelper.gson.fromJson(json,PublishVO.class);
         final ResultVO resultVO=new ResultVO();
         resultVO.id =publishVO.id;
         resultVO.topic=publishVO.topic;
         resultVO.data=publishVO.data;
+        final int finalCallbackId = callbackId;
         mConnection.publish(publishVO.topic, publishVO.data.getBytes(), getQos(publishVO.qos),
                 publishVO.retainFlag, new Callback<Void>() {
                     @Override
                     public void onSuccess(Void value) {
                         resultVO.isSuccess=true;
-                        callBackJsObjectOnUIThread(JsConst.CALLBACK_PUBLISH,DataHelper.gson.toJsonTree(resultVO));
+                         if(finalCallbackId !=-1){
+                            callbackToJs(finalCallbackId,false,0,DataHelper.gson.toJsonTree(resultVO));
+                        }else{
+                             callBackJsObjectOnUIThread(JsConst.CALLBACK_PUBLISH,DataHelper.gson.toJsonTree(resultVO));
+                         }
                     }
 
                     @Override
                     public void onFailure(Throwable value) {
                         resultVO.isSuccess=false;
-                        callBackJsObjectOnUIThread(JsConst.CALLBACK_PUBLISH,DataHelper.gson.toJsonTree(resultVO));
+                         if(finalCallbackId !=-1){
+                            callbackToJs(finalCallbackId,false,1,value.getMessage());
+                        }else{
+                             callBackJsObjectOnUIThread(JsConst.CALLBACK_PUBLISH,DataHelper.gson.toJsonTree(resultVO));
+                         }
                     }
                 });
     }
 
     public void disconnect(String[] params) {
+        int callbackId=-1;
+        if (params.length>0){
+            callbackId= Integer.parseInt(params[0]);
+        }
         mStatus=3;
         callbackStatus();
         if (mConnection!=null){
             final ResultVO resultVO=new ResultVO();
+            final int finalCallbackId = callbackId;
             mConnection.disconnect(new Callback<Void>() {
                 @Override
                 public void onSuccess(Void value) {
@@ -284,14 +341,22 @@ public class EUExMqtt extends EUExBase{
                     mStatus=4;
                     callbackStatus();
                     mqtt=null;
-                    callBackJsObjectOnUIThread(JsConst.CALLBACK_DISCONNECT, DataHelper.gson.toJsonTree(resultVO));
+                    if(finalCallbackId !=-1){
+                        callbackToJs(finalCallbackId,false,0);
+                    }else{
+                        callBackJsObjectOnUIThread(JsConst.CALLBACK_DISCONNECT, DataHelper.gson.toJsonTree(resultVO));
+                    }
                 }
 
                 @Override
                 public void onFailure(Throwable value) {
                     resultVO.isSuccess=false;
                     mqtt=null;
-                    callBackJsObjectOnUIThread(JsConst.CALLBACK_DISCONNECT, DataHelper.gson.toJsonTree(resultVO));
+                    if(finalCallbackId !=-1){
+                        callbackToJs(finalCallbackId,false,1,value.getMessage());
+                    }else{
+                        callBackJsObjectOnUIThread(JsConst.CALLBACK_DISCONNECT, DataHelper.gson.toJsonTree(resultVO));
+                    }
                 }
             });
         }
