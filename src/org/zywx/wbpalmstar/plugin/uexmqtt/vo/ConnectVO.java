@@ -20,7 +20,7 @@ public class ConnectVO implements Serializable {
 
     public String password;
 
-    public int keepAliveInterval;
+    public int keepAliveInterval=-1;
 
     public LWTVO LWT;
 

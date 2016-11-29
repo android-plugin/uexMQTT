@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 
+import android.text.TextUtils;
 import org.fusesource.hawtbuf.Buffer;
 import org.fusesource.hawtbuf.UTF8Buffer;
 import org.fusesource.mqtt.client.Callback;
@@ -81,10 +82,18 @@ public class EUExMqtt extends EUExBase{
         ConnectVO connectVO= DataHelper.gson.fromJson(json,ConnectVO.class);
         try {
             mqtt.setHost(connectVO.server,connectVO.port);
-            mqtt.setUserName(connectVO.username);
-            mqtt.setPassword(connectVO.password);
-            mqtt.setClientId(connectVO.clientId);
-            mqtt.setKeepAlive((short) connectVO.keepAliveInterval);
+            if (!TextUtils.isEmpty(connectVO.username)) {
+                mqtt.setUserName(connectVO.username);
+            }
+            if (!TextUtils.isEmpty(connectVO.password)) {
+                mqtt.setPassword(connectVO.password);
+            }
+            if (!TextUtils.isEmpty(connectVO.clientId)) {
+                mqtt.setClientId(connectVO.clientId);
+            }
+            if (connectVO.keepAliveInterval!=-1) {
+                mqtt.setKeepAlive((short) connectVO.keepAliveInterval);
+            }
             if (connectVO.LWT!=null&&connectVO.LWT.enable){
                 LWTVO lwtvo=connectVO.LWT;
                 if (lwtvo.topic!=null){
@@ -212,7 +221,7 @@ public class EUExMqtt extends EUExBase{
                 BDebug.i("subscribe success:",new String(value));
                 resultVO.isSuccess=true;
                 if(finalCallbackId !=-1){
-                    callbackToJs(finalCallbackId,false,0,DataHelper.gson.toJsonTree(resultVO));
+                    callbackToJs(finalCallbackId,false,0,resultVO.topic);
                 }else{
                     callBackJsObjectOnUIThread(JsConst.CALLBACK_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
                 }
@@ -245,7 +254,7 @@ public class EUExMqtt extends EUExBase{
         }
     }
 
-    public void unSubscribe(String[] params) {
+    public void unsubscribe(String[] params) {
         if (params == null || params.length < 1) {
             errorCallback(0, 0, "error params!");
             return;
@@ -266,7 +275,7 @@ public class EUExMqtt extends EUExBase{
             public void onSuccess(Void value) {
                 resultVO.isSuccess=true;
                 if(finalCallbackId !=-1){
-                     callbackToJs(finalCallbackId,false,0,DataHelper.gson.toJsonTree(resultVO));
+                     callbackToJs(finalCallbackId,false,0,resultVO.topic);
                 }else{
                      callBackJsObjectOnUIThread(JsConst.CALLBACK_UN_SUBSCRIBE,DataHelper.gson.toJsonTree(resultVO));
                  }
@@ -306,7 +315,7 @@ public class EUExMqtt extends EUExBase{
                     public void onSuccess(Void value) {
                         resultVO.isSuccess=true;
                          if(finalCallbackId !=-1){
-                            callbackToJs(finalCallbackId,false,0,DataHelper.gson.toJsonTree(resultVO));
+                            callbackToJs(finalCallbackId,false,0,resultVO.topic);
                         }else{
                              callBackJsObjectOnUIThread(JsConst.CALLBACK_PUBLISH,DataHelper.gson.toJsonTree(resultVO));
                          }

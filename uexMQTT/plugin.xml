@@ -6,7 +6,7 @@
         <method name="init" />
         <method name="connect" />
         <method name="subscribe" />
-        <method name="unSubscribe" />
+        <method name="unsubscribe" />
         <method name="publish" />
         <method name="disconnect" />
     </plugin>

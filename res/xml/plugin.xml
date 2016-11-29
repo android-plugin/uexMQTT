@@ -5,7 +5,7 @@
         <method name="init" params="" type="1"/>
         <method name="connect" params="" type="1"/>
         <method name="subscribe" params="" type="1"/>
-        <method name="unSubscribe" params="" type="1"/>
+        <method name="unsubscribe" params="" type="1"/>
         <method name="publish" params="" type="1"/>
         <method name="disconnect" params="" type="1"/>
         <method name="onStatusChange" params="" type="2"/>
