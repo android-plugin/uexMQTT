@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexMQTT" version="4.0.0" build="1">
-        <info>1:4.0</info>
+        uexName="uexMQTT" version="4.0.1" build="2017101901">
+        <info>1:Mqtt插件接口失效</info>
         <build>0:Mqtt插件</build>
     </plugin>
 </uexplugins>
