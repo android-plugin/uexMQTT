@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        className="org.zywx.wbpalmstar.plugin.uexmqtt.EUExMqtt" uexName="uexMQTT"
-        global="true">
+        className="org.zywx.wbpalmstar.plugin.uexmqtt.EUExMqtt" uexName="uexMQTT">
         <method name="init" />
         <method name="connect" />
         <method name="subscribe" />
